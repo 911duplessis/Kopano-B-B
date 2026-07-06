@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kopano — Property Information Form</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --charcoal:#1C1B18;
+    --ivory:#F1EDE3;
+    --gold:#C08A3E;
+    --red:#B33A2E;
+    --sage:#7A8B6F;
+    --line: rgba(28,27,24,0.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Inter',sans-serif; background:var(--ivory); color:var(--charcoal);
+    line-height:1.5;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif; font-weight:600;}
+
+  .header{
+    background:var(--charcoal); color:var(--ivory);
+    padding:44px 24px 40px; text-align:center;
+  }
+  .header .brand{font-family:'Fraunces',serif; font-size:1.6rem; font-weight:700; letter-spacing:0.02em;}
+  .header .sub{
+    font-size:0.75rem; text-transform:uppercase; letter-spacing:0.14em;
+    color:var(--gold); margin-top:6px;
+  }
+  .header p{
+    max-width:520px; margin:20px auto 0; color:rgba(241,237,227,0.7); font-size:0.92rem;
+  }
+
+  .wrap{max-width:720px; margin:0 auto; padding:40px 20px 100px;}
+
+  .progress-bar{
+    position:sticky; top:0; background:var(--ivory); z-index:10;
+    padding:14px 0; border-bottom:1px solid var(--line); margin-bottom:8px;
+  }
+  .progress-track{
+    height:6px; background:rgba(28,27,24,0.08); border-radius:10px; overflow:hidden;
+  }
+  .progress-fill{
+    height:100%; background:var(--gold); width:0%; transition:width 0.25s ease; border-radius:10px;
+  }
+  .progress-label{
+    font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:rgba(28,27,24,0.55);
+    margin-top:8px; text-transform:uppercase; letter-spacing:0.08em;
+  }
+
+  .section-card{
+    background:#fff; border:1px solid var(--line); border-radius:12px;
+    padding:32px 28px; margin-top:28px;
+  }
+  .section-card h2{
+    font-size:1.35rem; display:flex; align-items:center; gap:12px; margin-bottom:6px;
+  }
+  .section-num{
+    width:30px; height:30px; border-radius:50%; background:var(--charcoal); color:var(--gold);
+    display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace;
+    font-size:0.8rem; flex-shrink:0;
+  }
+  .section-card > p.hint{color:rgba(28,27,24,0.55); font-size:0.86rem; margin-bottom:22px; margin-left:42px;}
+
+  .field{margin-bottom:18px;}
+  .field label{
+    display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px; color:var(--charcoal);
+  }
+  .field label .opt{font-weight:400; color:rgba(28,27,24,0.4); font-size:0.78rem;}
+  .field input[type=text], .field input[type=tel], .field input[type=email], .field textarea, .field select{
+    width:100%; padding:11px 14px; border:1.5px solid var(--line); border-radius:7px;
+    font-family:'Inter',sans-serif; font-size:0.92rem; background:var(--ivory);
+    transition: border-color 0.15s ease;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{
+    outline:none; border-color:var(--gold); background:#fff;
+  }
+  .field textarea{resize:vertical; min-height:70px;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+
+  .room-block{
+    border:1.5px dashed var(--line); border-radius:8px; padding:18px; margin-bottom:14px; position:relative;
+  }
+  .room-block .room-title{
+    font-family:'JetBrains Mono',monospace; font-size:0.72rem; text-transform:uppercase;
+    letter-spacing:0.08em; color:var(--gold); margin-bottom:12px;
+  }
+  .remove-room{
+    position:absolute; top:14px; right:14px; background:none; border:none;
+    color:var(--red); font-size:0.78rem; cursor:pointer; font-family:'Inter',sans-serif;
+  }
+  .add-room-btn{
+    background:none; border:1.5px dashed var(--gold); color:var(--gold);
+    padding:10px 18px; border-radius:7px; font-size:0.85rem; font-weight:600;
+    cursor:pointer; width:100%; font-family:'Inter',sans-serif;
+  }
+  .add-room-btn:hover{background:rgba(192,138,62,0.08);}
+
+  .amenity-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-top:6px;
+  }
+  .amenity-chip{
+    display:flex; align-items:center; gap:8px; padding:9px 12px; border:1.5px solid var(--line);
+    border-radius:7px; font-size:0.84rem; cursor:pointer; background:var(--ivory);
+  }
+  .amenity-chip input{accent-color:var(--gold); width:15px; height:15px;}
+  .amenity-chip.checked{border-color:var(--gold); background:rgba(192,138,62,0.08);}
+
+  .sticky-footer{
+    position:sticky; bottom:0; background:var(--ivory); border-top:1px solid var(--line);
+    padding:18px 20px; margin-top:36px; display:flex; gap:12px; flex-wrap:wrap;
+  }
+  .btn{
+    flex:1; min-width:180px; padding:15px 20px; border-radius:8px; font-weight:600;
+    font-size:0.94rem; cursor:pointer; border:none; font-family:'Inter',sans-serif;
+    transition:transform 0.12s ease;
+  }
+  .btn:active{transform:scale(0.98);}
+  .btn-primary{background:var(--gold); color:var(--charcoal);}
+  .btn-secondary{background:var(--charcoal); color:var(--ivory);}
+
+  .output-box{
+    display:none; background:var(--charcoal); color:var(--ivory); border-radius:10px;
+    padding:24px; margin-top:24px; font-family:'JetBrains Mono',monospace; font-size:0.8rem;
+    white-space:pre-wrap; line-height:1.7; max-height:400px; overflow-y:auto;
+  }
+  .output-box.show{display:block;}
+  .copied-flag{
+    display:none; background:var(--sage); color:#fff; padding:10px 16px; border-radius:7px;
+    text-align:center; font-size:0.85rem; font-weight:600; margin-top:12px;
+  }
+  .copied-flag.show{display:block;}
+
+  @media (max-width:600px){
+    .field-row{grid-template-columns:1fr;}
+    .section-card{padding:24px 18px;}
+    .section-card > p.hint{margin-left:0; margin-top:8px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand">KOPANO</div>
+  <div class="sub">Property Information Form</div>
+  <p>We need the details below to build your new website, booking system, and payment setup. Some fields may already be filled in — please check, correct, and complete the rest.</p>
+</div>
+
+<div class="progress-bar">
+  <div class="wrap" style="padding:0;">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0% complete</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- SECTION 1: Business Identity -->
+  <div class="section-card">
+    <h2><span class="section-num">01</span> Business Identity</h2>
+    <p class="hint">Confirm whether this is one property or two — this affects the whole site structure.</p>
+
+    <div class="field">
+      <label>Registered business / property name(s)</label>
+      <textarea data-field="business_names" placeholder="e.g. Kopano Bed & Breakfast (and Pilanesberg View Guest House, if separate)"></textarea>
+    </div>
+    <div class="field">
+      <label>Is this ONE property or TWO separate properties?</label>
+      <select data-field="property_count">
+        <option value="">Select...</option>
+        <option value="One property">One property only</option>
+        <option value="Two separate properties">Two separate properties (list both below)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Year established <span class="opt">(optional)</span></label>
+      <input type="text" data-field="year_established" placeholder="e.g. 2009">
+    </div>
+    <div class="field">
+      <label>Grading / star rating <span class="opt">(optional, e.g. TGCSA 3-star)</span></label>
+      <input type="text" data-field="grading" placeholder="e.g. TGCSA 3-star graded">
+    </div>
+  </div>
+
+  <!-- SECTION 2: Contact & Location -->
+  <div class="section-card">
+    <h2><span class="section-num">02</span> Contact &amp; Location</h2>
+    <p class="hint">If there are two properties, please list each address separately in the notes field.</p>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Primary phone number</label>
+        <input type="tel" data-field="phone_primary" placeholder="+27 ...">
+      </div>
+      <div class="field">
+        <label>WhatsApp number <span class="opt">(if different)</span></label>
+        <input type="tel" data-field="whatsapp" placeholder="+27 ...">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Bookings email</label>
+        <input type="email" data-field="email_bookings" placeholder="bookings@...">
+      </div>
+      <div class="field">
+        <label>General enquiries email</label>
+        <input type="email" data-field="email_general" placeholder="info@...">
+      </div>
+    </div>
+    <div class="field">
+      <label>Full physical address(es)</label>
+      <textarea data-field="addresses" placeholder="Street, area, town, province, postal code — list each property separately if two"></textarea>
+    </div>
+    <div class="field">
+      <label>Google Maps link or GPS coordinates <span class="opt">(optional)</span></label>
+      <input type="text" data-field="gps" placeholder="Paste Google Maps link">
+    </div>
+  </div>
+
+  <!-- SECTION 3: Rooms -->
+  <div class="section-card">
+    <h2><span class="section-num">03</span> Rooms &amp; Rates</h2>
+    <p class="hint">Add one entry per room type. Click "Add another room type" to repeat.</p>
+    <div id="roomsContainer"></div>
+    <button type="button" class="add-room-btn" onclick="addRoom()">+ Add another room type</button>
+  </div>
+
+  <!-- SECTION 4: Amenities -->
+  <div class="section-card">
+    <h2><span class="section-num">04</span> Amenities</h2>
+    <p class="hint">Select everything that applies property-wide.</p>
+    <div class="amenity-grid" id="amenityGrid">
+      <!-- populated by JS -->
+    </div>
+    <div class="field" style="margin-top:16px;">
+      <label>Other amenities <span class="opt">(optional)</span></label>
+      <input type="text" data-field="amenities_other" placeholder="e.g. game drives, boma dinners">
+    </div>
+  </div>
+
+  <!-- SECTION 5: Media & Brand -->
+  <div class="section-card">
+    <h2><span class="section-num">05</span> Media &amp; Brand</h2>
+    <p class="hint">List what you have available — we'll request the actual files separately via email/WhatsApp.</p>
+    <div class="field">
+      <label>Logo available?</label>
+      <select data-field="logo_available">
+        <option value="">Select...</option>
+        <option value="Yes, will send">Yes, will send file</option>
+        <option value="No, needs design">No — needs to be designed</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Photos available?</label>
+      <select data-field="photos_available">
+        <option value="">Select...</option>
+        <option value="Yes, professional photos">Yes, professional photos</option>
+        <option value="Yes, phone photos only">Yes, phone photos only</option>
+        <option value="No, needs photography">No — needs photography</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Social media handles <span class="opt">(actual working links only)</span></label>
+      <textarea data-field="social_handles" placeholder="Facebook: ...&#10;Instagram: ..."></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 6: Payments -->
+  <div class="section-card">
+    <h2><span class="section-num">06</span> Payments &amp; Banking</h2>
+    <p class="hint">This determines which payment gateway we use — do not send full card/account numbers here, just the basics below.</p>
+    <div class="field">
+      <label>Country of business registration</label>
+      <input type="text" data-field="business_country" placeholder="e.g. South Africa">
+    </div>
+    <div class="field">
+      <label>Country where payments should settle</label>
+      <input type="text" data-field="settlement_country" placeholder="e.g. South Africa, Nigeria">
+    </div>
+    <div class="field">
+      <label>Bank name <span class="opt">(no account numbers needed yet)</span></label>
+      <input type="text" data-field="bank_name" placeholder="e.g. FNB, GTBank">
+    </div>
+    <div class="field">
+      <label>Deposit required to secure a booking? <span class="opt">(e.g. 50%, full amount)</span></label>
+      <input type="text" data-field="deposit_policy" placeholder="e.g. 50% deposit, balance on arrival">
+    </div>
+  </div>
+
+  <!-- SECTION 7: Notes -->
+  <div class="section-card">
+    <h2><span class="section-num">07</span> Anything Else</h2>
+    <p class="hint">Cancellation policy, check-in/out times, house rules, special notes.</p>
+    <div class="field">
+      <textarea data-field="notes" placeholder="Type anything else we should know..." style="min-height:100px;"></textarea>
+    </div>
+  </div>
+
+  <div class="sticky-footer">
+    <button class="btn btn-primary" onclick="generateSummary()">Generate Summary</button>
+    <button class="btn btn-secondary" onclick="copySummary()">Copy Summary</button>
+  </div>
+
+  <div class="copied-flag" id="copiedFlag">✓ Copied — paste this into WhatsApp</div>
+  <div class="output-box" id="outputBox"></div>
+
+</div>
+
+<script>
+const amenitiesList = [
+  "Free WiFi","Swimming pool","Breakfast included","Air conditioning",
+  "Conference facilities","Restaurant on-site","Bar / lounge","Airport transfer",
+  "Secure parking","24-hour reception","DSTV / satellite TV","Braai / BBQ area",
+  "Laundry service","Wheelchair accessible","Pet friendly","Game drives"
+];
+
+const amenityGrid = document.getElementById('amenityGrid');
+amenitiesList.forEach((a,i)=>{
+  const label = document.createElement('label');
+  label.className = 'amenity-chip';
+  label.innerHTML = `<input type="checkbox" data-amenity="${a}"> ${a}`;
+  amenityGrid.appendChild(label);
+});
+amenityGrid.addEventListener('change', (e)=>{
+  if(e.target.checked){ e.target.closest('.amenity-chip').classList.add('checked'); }
+  else{ e.target.closest('.amenity-chip').classList.remove('checked'); }
+  updateProgress();
+});
+
+let roomCount = 0;
+function addRoom(){
+  roomCount++;
+  const div = document.createElement('div');
+  div.className = 'room-block';
+  div.dataset.room = roomCount;
+  div.innerHTML = `
+    <div class="room-title">Room Type ${roomCount}</div>
+    <button type="button" class="remove-room" onclick="this.parentElement.remove(); updateProgress();">Remove</button>
+    <div class="field-row">
+      <div class="field">
+        <label>Room name</label>
+        <input type="text" data-room-field="name" placeholder="e.g. Family Room">
+      </div>
+      <div class="field">
+        <label>Max occupancy</label>
+        <input type="text" data-room-field="occupancy" placeholder="e.g. 3 adults">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Bed configuration</label>
+        <input type="text" data-room-field="beds" placeholder="e.g. 1 queen + 1 single">
+      </div>
+      <div class="field">
+        <label>Price per night (ZAR)</label>
+        <input type="text" data-room-field="price" placeholder="e.g. R1200">
+      </div>
+    </div>
+    <div class="field">
+      <label>Room features <span class="opt">(optional)</span></label>
+      <input type="text" data-room-field="features" placeholder="e.g. en-suite, mountain view">
+    </div>
+  `;
+  document.getElementById('roomsContainer').appendChild(div);
+  div.addEventListener('input', updateProgress);
+}
+addRoom(); // start with one
+
+function updateProgress(){
+  const inputs = document.querySelectorAll('[data-field], [data-room-field]');
+  const checkboxes = document.querySelectorAll('[data-amenity]');
+  let filled = 0, total = 0;
+  inputs.forEach(el=>{
+    total++;
+    if(el.value && el.value.trim() !== '') filled++;
+  });
+  total += 1; // amenities counted as one block
+  if([...checkboxes].some(c=>c.checked)) filled++;
+
+  const pct = total ? Math.round((filled/total)*100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = pct + '% complete';
+}
+
+document.querySelectorAll('[data-field]').forEach(el=>{
+  el.addEventListener('input', updateProgress);
+  el.addEventListener('change', updateProgress);
+});
+
+function generateSummary(){
+  const get = (name) => {
+    const el = document.querySelector(`[data-field="${name}"]`);
+    return el && el.value.trim() ? el.value.trim() : '—';
+  };
+
+  let rooms = [];
+  document.querySelectorAll('.room-block').forEach((block, i)=>{
+    const f = (field) => {
+      const el = block.querySelector(`[data-room-field="${field}"]`);
+      return el && el.value.trim() ? el.value.trim() : '—';
+    };
+    rooms.push(`  Room ${i+1}: ${f('name')} | Occupancy: ${f('occupancy')} | Beds: ${f('beds')} | Price/night: ${f('price')} | Features: ${f('features')}`);
+  });
+
+  let amenities = [];
+  document.querySelectorAll('[data-amenity]').forEach(c=>{
+    if(c.checked) amenities.push(c.dataset.amenity);
+  });
+
+  const summary =
+`KOPANO — PROPERTY INFORMATION SUMMARY
+Generated: ${new Date().toLocaleDateString()}
+
+01 — BUSINESS IDENTITY
+Name(s): ${get('business_names')}
+One or two properties: ${get('property_count')}
+Established: ${get('year_established')}
+Grading: ${get('grading')}
+
+02 — CONTACT & LOCATION
+Phone: ${get('phone_primary')}
+WhatsApp: ${get('whatsapp')}
+Bookings email: ${get('email_bookings')}
+General email: ${get('email_general')}
+Address(es): ${get('addresses')}
+GPS/Maps: ${get('gps')}
+
+03 — ROOMS & RATES
+${rooms.length ? rooms.join(String.fromCharCode(10)) : '  —'}
+
+04 — AMENITIES
+${amenities.length ? amenities.join(', ') : '—'}
+Other: ${get('amenities_other')}
+
+05 — MEDIA & BRAND
+Logo: ${get('logo_available')}
+Photos: ${get('photos_available')}
+Social: ${get('social_handles')}
+
+06 — PAYMENTS & BANKING
+Business country: ${get('business_country')}
+Settlement country: ${get('settlement_country')}
+Bank: ${get('bank_name')}
+Deposit policy: ${get('deposit_policy')}
+
+07 — NOTES
+${get('notes')}
+`;
+
+  const box = document.getElementById('outputBox');
+  box.textContent = summary;
+  box.classList.add('show');
+  box.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function copySummary(){
+  const box = document.getElementById('outputBox');
+  if(!box.classList.contains('show')){
+    generateSummary();
+  }
+  navigator.clipboard.writeText(box.textContent).then(()=>{
+    const flag = document.getElementById('copiedFlag');
+    flag.classList.add('show');
+    setTimeout(()=>flag.classList.remove('show'), 3000);
+  });
+}
+
+updateProgress();
+</script>
+
+</body>
+</html>
